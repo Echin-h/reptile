@@ -12,7 +12,7 @@
 
 ## 使用方法
 
-```python thread.py```
+```python ./cmd/thread.py```
 
 
 ```for index in range(40,41):``` 修改index的范围,也是页码的范围
