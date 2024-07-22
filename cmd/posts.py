@@ -11,7 +11,6 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-
 # " id="postmessage_24837376
 
 def getMessages(thread_url):
@@ -35,17 +34,19 @@ def getMessages(thread_url):
 
 
 def getSubject(thread_url):
-    try:
-        response = requests.get(thread_url)
-    except requests.exceptions.RequestException as e:
-        return ''
-    response.encoding = 'utf-8'
-    html_content = response.text
-    soup = BeautifulSoup(html_content, 'html.parser')
-    subject_tag = soup.find('span', id='thread_subject')
-    print(subject_tag.text)
-    return subject_tag.text
+    # try:
+    #     response = requests.get(thread_url)
+    # except requests.exceptions.RequestException as e:
+    #     return ''
+    # response.encoding = 'utf-8'
+    # html_content = response.text
+    # soup = BeautifulSoup(html_content, 'html.parser')
+    # subject_tag = soup.find('span', id='thread_subject')
+    # print(subject_tag.text)
+    # return subject_tag.text.strip()
+    return ''
 
-
-def gettext(thread_url):
+def gettext(thread_url, nit):
+    # print ('第' + str(nit) + '个网页:------------------------------------------')
+    nit += 1
     return getMessages(thread_url) + getSubject(thread_url)

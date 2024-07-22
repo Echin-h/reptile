@@ -1,10 +1,10 @@
-import re
+import time
 
 from bs4 import BeautifulSoup
 import requests
 from urllib.parse import urljoin
-import forum as forum
-import posts
+import posts, forum
+import save
 
 base_url = "https://5278.cc"
 index = 20
@@ -27,7 +27,8 @@ links = soup.find_all('a', href=True)
 
 new_links = []
 
-# n = 0
+n = 1
+
 for link in links:
     if 'thread' in link['href']:
         new_link = urljoin(base_url, link['href'])
@@ -35,8 +36,27 @@ for link in links:
         if new_link not in new_links:
             new_links.append(new_link)
 
-
 print(new_links)
+save_links = []
 for new_link in new_links:
-    ps = posts.gettext(new_link)
-    print(ps)
+    try:
+        time.sleep(2)  # 爬虫爬的慢一点，不然会被封IP
+        ps = posts.gettext(new_link, n)
+        print(ps)
+        words = [ps]
+        if not words:
+            continue
+        # break
+        save_links.append(words)
+
+        n += 1
+    except Exception as e:
+        # print(ps)
+        # n += 1
+        time.sleep(5)
+        continue
+
+try:
+    save.write_to_csv(save_links, './data.csv', False)
+except Exception as e:
+    print(e)
