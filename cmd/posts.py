@@ -11,12 +11,13 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
+
 # " id="postmessage_24837376
 
 def getMessages(thread_url):
     base_url = thread_url[0]
     try:
-        response = requests.get(thread_url)
+        response = requests.get(thread_url, timeout=10)
     except requests.exceptions.RequestException as e:
         return ''
     response.encoding = 'utf-8'
@@ -46,7 +47,7 @@ def getSubject(thread_url):
     # return subject_tag.text.strip()
     return ''
 
+
 def gettext(thread_url, nit):
-    # print ('第' + str(nit) + '个网页:------------------------------------------')
-    nit += 1
+    print('第' + str(nit) + '个Info:------------------------------------------')
     return getMessages(thread_url) + getSubject(thread_url)

@@ -1,3 +1,4 @@
+import random
 import time
 
 from bs4 import BeautifulSoup
@@ -7,56 +8,84 @@ import posts, forum
 import save
 
 base_url = "https://5278.cc"
-index = 20
+# index = 20
 
 # 帖子的URL
 # base_url = 'https://5278.cc'
 # thread_url = urljoin(base_url, 'forum-219-4.html')
+index = 21
+filepath = './data' + str(index) + '.csv'
 
-thread_url = forum.getForumUrl(base_url, index)
+with open(filepath, 'w') as file:
+    pass
 
-# 发送HTTP请求
-response = requests.get(thread_url)
-response.encoding = 'utf-8'  # 根据响应内容设置正确的编码
+for index in range(21, 41):
+    thread_url = forum.getForumUrl(base_url, index)
 
-html_content = response.text
+    # 发送HTTP请求
+    response = requests.get(thread_url, timeout=10)
+    response.encoding = 'utf-8'  # 根据响应内容设置正确的编码
 
-soup = BeautifulSoup(html_content, 'html.parser')
+    html_content = response.text
 
-links = soup.find_all('a', href=True)
+    soup = BeautifulSoup(html_content, 'html.parser')
 
-new_links = []
+    links = soup.find_all('a', href=True)
 
-n = 1
+    new_links = []
 
-for link in links:
-    if 'thread' in link['href']:
-        new_link = urljoin(base_url, link['href'])
-        # print(new_link)
-        if new_link not in new_links:
-            new_links.append(new_link)
+    n = 1
 
-print(new_links)
-save_links = []
-for new_link in new_links:
-    try:
-        time.sleep(2)  # 爬虫爬的慢一点，不然会被封IP
-        ps = posts.gettext(new_link, n)
-        print(ps)
-        words = [ps]
-        if not words:
+    for link in links:
+        if 'thread' in link['href']:
+            new_link = urljoin(base_url, link['href'])
+            # print(new_link)
+            if new_link not in new_links:
+                new_links.append(new_link)
+
+    print(new_links)
+    save_links = []
+    n = 1
+    for new_link in new_links:
+        try:
+            # time.sleep()  # 爬虫爬的慢一点，不然会被封IP
+            ps = posts.gettext(new_link, n)
+            print(ps)
+            words = [ps]
+            # if not ps:
+            #     continue
+            if words:
+                save_links.append(words)
+            # break
+            n += 1
+            time.sleep(random.randint(1,3))
+        except Exception as e:
+            time.sleep(random.randint(3,7))
             continue
-        # break
-        save_links.append(words)
 
-        n += 1
+    # n = 1
+    # for new_link in new_links:
+    #     try:
+    #         ps = posts.gettext(new_link,n)
+    #         n += 1
+    #         words = [ps]
+    #         if words:
+    #             save_links.append(words)
+    #     except Exception as e:
+    #         print(f"Error processing {new_link}: {e}")
+    #         continue
+
+    # path = './data' + str(index) + '.csv'
+    #
+    # with open(path, 'w') as file:
+    #     pass
+    # 写入一些内容到文件中，这里只是一个示例
+
+    path = './data' + str(index) + '.csv'
+
+    try:
+        save.write_to_csv(save_links, path, False)
     except Exception as e:
-        # print(ps)
-        # n += 1
-        time.sleep(5)
-        continue
+        print(e)
 
-try:
-    save.write_to_csv(save_links, './data.csv', False)
-except Exception as e:
-    print(e)
+    print("第" + str(index) + "页爬取完-----------------------------------------------------------------")
